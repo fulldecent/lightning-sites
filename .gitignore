@@ -4,3 +4,9 @@
 #
 
 */
+
+#
+# Specific things for rake
+#
+
+.rake_t_cache
