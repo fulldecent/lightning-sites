@@ -1,6 +1,56 @@
 # http://stackoverflow.com/a/11320444/300224
 Rake::TaskManager.record_task_metadata = true
 
+desc "Review and configure each directory in here"
+task :setup do
+  puts 'Reviewing and setting up each directory'
+  folders = Dir.glob('*/')
+  if folders.count == 0
+    puts 'There are no directories to setup. Please create a directory:'.red
+    puts '    mkdir example.com'.yellow
+    puts 'Then come back here and run:'.red
+    puts '    rake setup'.yellow
+    next
+  end
+
+  folders.each do |f|
+    puts '', ("📂  Setting up " + f).yellow
+    folder_rakefile = f + "Rakefile"
+    if File.exists?(folder_rakefile)
+      puts '   Found Rakefile at ' + folder_rakefile.yellow
+      setup_is_good = true
+      safe_object = Object.new
+      safe_object.instance_eval(File.read(folder_rakefile))
+
+#      require 'yaml'
+#      puts YAML::dump(safe_object)
+#      puts safe_object.instance_variables
+
+      if safe_object.instance_variable_defined?("@staging_dir")
+        puts "   Staging directory is " + f.yellow + safe_object.instance_variable_get("@staging_dir").yellow
+      else
+        puts "   Staging directory is not specified".red
+        setup_is_good = false
+      end
+
+      if safe_object.instance_variable_defined?("@source_dir")
+        puts "   Source directory is " + f.yellow + safe_object.instance_variable_get("@source_dir").yellow
+      else
+        puts "   Source directory is not specified".red
+        setup_is_good = false
+      end
+
+      if setup_is_good == false
+        puts "   Some problems were found with the Rakefile at ".red + folder_rakefile.red
+        puts "   Please see documentation at https://github.com/fulldecent/Sites".red
+      end
+    else
+      puts 'No Rakefile found at '.yellow + folder_rakefile.yellow
+      puts "FIXME: Add automatic configurator here".red
+    end
+  end
+end
+
 #
 # CONFIGURATION
 #
