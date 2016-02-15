@@ -1,6 +1,6 @@
 # Sites
 
-Dead-simple deployment for your ~/Sites folder
+:cloud: Lightning deployment for your ~/Sites folders
 
 
 # How to set it up

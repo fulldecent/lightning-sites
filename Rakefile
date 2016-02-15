@@ -3,7 +3,8 @@ Rake::TaskManager.record_task_metadata = true
 
 desc "Review and configure each directory in here"
 task :setup do
-  puts 'Reviewing and setting up each directory'
+  puts "🌩  Preparing your websites for lightning deployment".green
+
   folders = Dir.glob('*/')
   if folders.count == 0
     puts 'There are no directories to setup. Please create a directory:'.red
@@ -14,7 +15,7 @@ task :setup do
   end
 
   folders.each do |f|
-    puts '', ("📂  Setting up " + f).yellow
+    puts '', ("📂  Found " + f).yellow
     folder_rakefile = f + "Rakefile"
     if File.exists?(folder_rakefile)
       puts '   Found Rakefile at ' + folder_rakefile.yellow
@@ -45,8 +46,9 @@ task :setup do
         puts "   Please see documentation at https://github.com/fulldecent/Sites".red
       end
     else
-      puts 'No Rakefile found at '.yellow + folder_rakefile.yellow
-      puts "FIXME: Add automatic configurator here".red
+      puts '   No Rakefile found at '.yellow + folder_rakefile.yellow
+      puts '   If this directory is not using '
+      puts "   FIXME: Add automatic configurator here".red
     end
   end
 end
