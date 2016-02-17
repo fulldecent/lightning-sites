@@ -1,9 +1,42 @@
 # http://stackoverflow.com/a/11320444/300224
 Rake::TaskManager.record_task_metadata = true
 
+class RakeBrowser
+  attr_reader :tasks
+  attr_reader :variables
+  attr_reader :loads
+
+  include Rake::DSL
+  def task(*args, &block)
+    if args.first.respond_to?(:id2name)
+      @tasks << args.first.id2name
+    elsif args.first.keys.first.respond_to?(:id2name)
+      @tasks << args.first.keys.first.id2name
+    end
+  end
+
+  def load(filename)
+    @loads << filename
+  end
+
+  def initialize(file)
+    @tasks = []
+    @loads = []
+    Dir.chdir(File.dirname(file)) do
+      eval(File.read(File.basename(file)))
+    end
+    @variables = Hash.new
+    instance_variables.each do |name|
+      @variables[name] = instance_variable_get(name)
+    end
+  end
+end
+
 desc "Review and configure each directory in here"
 task :setup do
   puts "🌩  Preparing your websites for lightning deployment".green
+  total_sites = 0
+  good_sites = 0
 
   folders = Dir.glob('*/')
   if folders.count == 0
@@ -15,69 +48,63 @@ task :setup do
   end
 
   folders.each do |f|
-    puts '', ("📂  Found " + f).yellow
+    puts '', ("☁️  Found " + f).yellow
     folder_rakefile = f + "Rakefile"
-    if File.exists?(folder_rakefile)
-      puts '   ✅  Found Rakefile at ' + folder_rakefile.yellow
-      setup_is_good = true
+    total_sites = total_sites + 1
 
-      class RakeBrowser
-        attr_reader :tasks
+    unless File.exists?(folder_rakefile)
+      puts '     No Rakefile found at ' + folder_rakefile
+      puts "     To setup 🌩 Lightning Deployment, add a Rakefile to this directory"
+      puts "     FIND AN EXAMPLE SITE RAKEFILE AT https://github.com/fulldecent/Sites".red
+      puts "     FIXME: Add automatic configurator here".red
+      next
+    end
 
-        include Rake::DSL
-        def task(*args, &block)
-          @tasks << args.first.keys.first.id2name
-        end
+    puts '     Found Rakefile at ' + folder_rakefile.yellow
+    setup_is_good = true
+    browser = RakeBrowser.new(f + "Rakefile")
+    browser.tasks.each do |task|
+      puts "       Task: " + task
+    end
 
-        def initialize(file)
-          @tasks = []
-          Dir.chdir(File.dirname(file)) do
-            eval(File.read(File.basename(file)))
-          end
-          @variables = instance_variables.map { |name| [name, instance_variable_get(name)] }
-        end
-
-        def variables
-          @variables = Hash.new
-          instance_variables.each do |name|
-            @variables[name] = instance_variable_get(name)
-          end
-          return @variables
-        end
-      end
-      browser = RakeBrowser.new(f + "Rakefile")
-      browser.tasks.each do |task|
-        puts "        Task: " + task
-      end
-
-      if browser.variables[:@staging_dir]
-        puts "   ✅  Staging directory is " + f.yellow + browser.variables[:@staging_dir].yellow
-      else
-        puts "   ❌  Staging directory is not specified".red
-        setup_is_good = false
-      end
-
-      if browser.variables[:@source_dir]
-        puts "   ✅  Source directory is " + f.yellow + browser.variables[:@source_dir].yellow
-      else
-        puts "   ❌  Source directory is not specified".red
-        setup_is_good = false
-      end
-
-      if browser.variables[:@bobobo]
-        puts "BOBOBO is ".red +  browser.variables[:@bobobo].to_s.red
-      end
-
-      if setup_is_good == false
-        puts "   Some problems were found with the Rakefile at ".red + folder_rakefile.red
-        puts "   Please see documentation at https://github.com/fulldecent/Sites".red
-      end
+    if browser.loads.include?('../common.rake')
+      puts "     Common rakefile is loaded"
     else
-      puts '   No Rakefile found at '.yellow + folder_rakefile.yellow
-      puts '   If this directory is not using '
-      puts "   FIXME: Add automatic configurator here".red
+      puts "     Common rakefile is not loaded".red
+      setup_is_good = false
+    end
+
+    if browser.variables[:@staging_dir]
+      puts "     Staging directory is " + f.yellow + browser.variables[:@staging_dir].yellow
+    else
+      puts "     Staging directory is not specified".red
+      setup_is_good = false
+    end
+
+    if browser.variables[:@source_dir]
+      puts "     Source directory is " + f.yellow + browser.variables[:@source_dir].yellow
+    else
+      puts "     Source directory is not specified".red
+      setup_is_good = false
+    end
+
+    if setup_is_good
+      good_sites = good_sites + 1
+      puts "     🌩  Boom, this site is good to go".green
+    else
+      puts "     Some problems were found with the Rakefile at ".red + folder_rakefile.red
+      puts "     Please see documentation at https://github.com/fulldecent/Sites".red
     end
   end
+
+  if good_sites > 0
+    puts ""
+    puts "🌩  Lightning deployment is setup for ".green + good_sites.to_s.green + " sites. To see the cool stuff you can do, type:".green
+    puts "", "    rake".yellow, "    (Yup, that's it)", ""
+  else
+
+  end
+
 end
 
 #
