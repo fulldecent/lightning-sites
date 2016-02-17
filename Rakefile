@@ -18,27 +18,54 @@ task :setup do
     puts '', ("📂  Found " + f).yellow
     folder_rakefile = f + "Rakefile"
     if File.exists?(folder_rakefile)
-      puts '   Found Rakefile at ' + folder_rakefile.yellow
+      puts '   ✅  Found Rakefile at ' + folder_rakefile.yellow
       setup_is_good = true
-      safe_object = Object.new
-      safe_object.instance_eval(File.read(folder_rakefile))
 
-#      require 'yaml'
-#      puts YAML::dump(safe_object)
-#      puts safe_object.instance_variables
+      class RakeBrowser
+        attr_reader :tasks
 
-      if safe_object.instance_variable_defined?("@staging_dir")
-        puts "   Staging directory is " + f.yellow + safe_object.instance_variable_get("@staging_dir").yellow
+        include Rake::DSL
+        def task(*args, &block)
+          @tasks << args.first.keys.first.id2name
+        end
+
+        def initialize(file)
+          @tasks = []
+          Dir.chdir(File.dirname(file)) do
+            eval(File.read(File.basename(file)))
+          end
+          @variables = instance_variables.map { |name| [name, instance_variable_get(name)] }
+        end
+
+        def variables
+          @variables = Hash.new
+          instance_variables.each do |name|
+            @variables[name] = instance_variable_get(name)
+          end
+          return @variables
+        end
+      end
+      browser = RakeBrowser.new(f + "Rakefile")
+      browser.tasks.each do |task|
+        puts "        Task: " + task
+      end
+
+      if browser.variables[:@staging_dir]
+        puts "   ✅  Staging directory is " + f.yellow + browser.variables[:@staging_dir].yellow
       else
-        puts "   Staging directory is not specified".red
+        puts "   ❌  Staging directory is not specified".red
         setup_is_good = false
       end
 
-      if safe_object.instance_variable_defined?("@source_dir")
-        puts "   Source directory is " + f.yellow + safe_object.instance_variable_get("@source_dir").yellow
+      if browser.variables[:@source_dir]
+        puts "   ✅  Source directory is " + f.yellow + browser.variables[:@source_dir].yellow
       else
-        puts "   Source directory is not specified".red
+        puts "   ❌  Source directory is not specified".red
         setup_is_good = false
+      end
+
+      if browser.variables[:@bobobo]
+        puts "BOBOBO is ".red +  browser.variables[:@bobobo].to_s.red
       end
 
       if setup_is_good == false
