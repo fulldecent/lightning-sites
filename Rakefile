@@ -102,17 +102,8 @@ task :setup do
     puts "🌩  Lightning deployment is setup for ".green + good_sites.to_s.green + " sites. To see the cool stuff you can do, type:".green
     puts "", "    rake".yellow, "    (Yup, that's it)", ""
   else
-
   end
-
 end
-
-#
-# CONFIGURATION
-#
-
-production_servers = ['SERVERA', 'SERVERB']
-
 
 #
 # COMMANDS TO SUB-RAKEFILES
@@ -122,7 +113,7 @@ desc "Run Rake task in each directory"
 task :distribute, :command do |t, args|
   require 'Shellwords'
   Dir.glob('./*/Rakefile').each do |f|
-    puts '#'.pink, ("# Processing " + File.dirname(f)).pink, '#'.pink
+    puts "🌩  ".cyan + File.dirname(f).cyan
     theCommand = args[:command].shellescape
     sh 'cd ' + File.dirname(f) + "; rake #{theCommand}"
   end
@@ -165,9 +156,21 @@ task :status do
 end
 
 
+
+
+
+
+
 ###
 ### update these:
 ###
+
+#
+# CONFIGURATION
+#
+
+production_servers = ['SERVERA', 'SERVERB']
+
 desc "FIXME: Find errors on production servers"
 task :find_errors do
   command = "cut -d' ' -f9- /var/log/httpd/*error.log | sort | uniq -c | sort -nr"
@@ -210,8 +213,16 @@ class String
     colorize(33)
   end
 
+  def blue
+    colorize(34)
+  end
+
   def pink
     colorize(35)
+  end
+
+  def cyan
+    colorize(36)
   end
 end
 

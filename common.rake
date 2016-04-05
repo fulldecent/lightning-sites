@@ -121,10 +121,10 @@ end
 namespace :html do
   desc "Checks HTML with htmlproof, excludes offsite broken link checking"
   task :check_onsite do
-    puts "Checking HTML".pink
+    puts "⚡️  Checking HTML".pink
     #sh "htmlproof --disable-external --check-html #{@staging_dir} || true"
-    sh "htmlproof --disable-external --check-html --checks-to-ignore ScriptCheck,LinkCheck,HtmlCheck #{@staging_dir} || true"
-    puts "Checked HTML".green
+    sh "htmlproof --disable-external --check-html --checks-to-ignore ScriptCheck,LinkCheck,HtmlCheck #{@staging_dir} > /dev/null || true"
+    puts "☀️  Checked HTML".green
   end
 
   desc "Checks HTML with htmlproof, excludes offsite broken link checking"
