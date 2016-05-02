@@ -119,18 +119,18 @@ namespace :seo do
 end
 
 namespace :html do
-  desc "Checks HTML with htmlproof, excludes offsite broken link checking"
+  desc "Checks HTML with htmlproofer, excludes offsite broken link checking"
   task :check_onsite do
     puts "⚡️  Checking HTML".pink
-    #sh "htmlproof --disable-external --check-html #{@staging_dir} || true"
-    sh "htmlproof --disable-external --check-html --checks-to-ignore ScriptCheck,LinkCheck,HtmlCheck #{@staging_dir} > /dev/null || true"
+    #sh "htmlproofer --disable-external --check-html #{@staging_dir} || true"
+    sh "htmlproofer --disable-external --check-html --checks-to-ignore ScriptCheck,LinkCheck,HtmlCheck #{@staging_dir} > /dev/null || true"
     puts "☀️  Checked HTML".green
   end
 
-  desc "Checks HTML with htmlproof, excludes offsite broken link checking"
+  desc "Checks HTML with htmlproofer, excludes offsite broken link checking"
   task :check_links do
     puts "Checking links".pink
-    sh "htmlproof --verbose --checks-to-ignore ScriptCheck,ImageCheck #{@staging_dir} || true"
+    sh "htmlproofer --verbose --checks-to-ignore ScriptCheck,ImageCheck #{@staging_dir} || true"
     puts "Checked HTML".green
   end
 end
