@@ -1,21 +1,21 @@
 ##
-## COMMON REQUIRED VARIABLE DEFINITIONS:
+## EVERY SITE MUST DEFINE THESE VARIABLES:
 ##
-## @production_server   Where we deploy this site
-## @production_user     SSH user
-## @production_www_dir  Deploy directory
+## @source_dir                 Raw source code
+## @staging_dir                Built HTML code
 ##
-## @staging_dir         Built HTML code
+##
+## OPTIONAL VARIABLES FOR DEPLOYMENT:
+##
+## @production_dir             A local or remote directory (rsync format) to deploy to
+## @production_backup_dir      Where backups go
+## @production_backup_targets  Hash of {folder => what_should_backup_to_there}
+##
 ##
 ## REQUIRED VARIABLES FOR GIT COMMANDS:
 ##
 ## @git_clone_url       Git server clone URL
 ## @git_branch          Branch we use
-## @source_dir          Raw source code
-##
-## REQUIRED VARIABLES FOR JEKYLL
-##
-## @source_dir          Raw source code
 ##
 
 # http://stackoverflow.com/a/11320444/300224
@@ -31,6 +31,13 @@ task :default do
 end
 
 namespace :git do
+  def source_dir_is_git?
+    return false if !File.directory?(@source_dir)
+    sh "cd #{@source_dir} && git rev-parse --git-dir > /dev/null 2> /dev/null" do |ok, res|
+      return ok
+    end
+  end
+
   desc "Download and create a copy of code from git server"
   task :clone do
     puts 'Cloning repository'.pink
@@ -47,8 +54,18 @@ namespace :git do
 
   desc "Shows status of all files in git repo"
   task :status do
+    if !source_dir_is_git?
+      puts "There is no git directory, skipping"
+      next
+    end
     puts 'Showing `git status` of all source files'.pink
     sh "cd #{@source_dir} && git status --short"
+  end
+
+  desc "Print the modified date for all files under source control"
+  task :stale_report do
+    return unless source_dir_is_git
+    sh "cd #{@source_dir} && git ls-files -z | xargs -0 -n1 -I{} -- git log -1 --format='%ai {}' {} | cut -b 1-11,27-"
   end
 end
 
@@ -67,12 +84,15 @@ namespace :jekyll do
   end
 end
 
+# Interact with a production environment
 namespace :rsync do
   desc "Bring deployed web server files local"
   task :pull do
+    raise '@production_dir is not defined' unless defined? @production_dir
+    raise '@staging_dir is not defined' unless defined? @source_dir
     puts 'Pulling website'.pink
     rsync_opts = '-vr --delete --exclude .git --exclude cache'
-    remote = "#{@production_user}@#{@production_server}:#{@production_www_dir}/"
+    remote = "#{@production_dir}/"
     local = "#{@staging_dir}/"
     sh "rsync #{rsync_opts} '#{remote}' '#{local}'"
     puts 'Pulled'.green
@@ -80,20 +100,24 @@ namespace :rsync do
 
   desc "Push local files to production web server"
   task :push do
+    raise '@production_dir is not defined' unless defined? @production_dir
+    raise '@staging_dir is not defined' unless defined? @source_dir
     puts 'Pushing website'.pink
     rsync_opts = '-r -c -v --ignore-times --chmod=ugo=rwX --delete --exclude .git --exclude cache'
-    remote = "#{@production_user}@#{@production_server}:#{@production_www_dir}/"
+    remote = "#{@production_dir}/"
     local = "#{@staging_dir}/"
     sh "rsync #{rsync_opts} '#{local}' '#{remote}'"
     puts 'Pushed'.green
   end
 
   desc "Backup production"
-  task :production_backup do
+  task :backup do
+    raise '@production_backup_dir is not defined' unless defined? @production_backup_dir
+    raise '@production_backup_targets is not defined' unless defined? @production_backup_targets
     puts "Backing up production".pink
     rsync_opts = '-va --delete --exclude .git'
     @production_backup_targets.each do |local_dir, remote_dir|
-      remote = "#{@production_user}@#{@production_server}:#{remote_dir}"
+      remote = "#{remote_dir}"
       local = "#{@production_backup_dir}/#{local_dir}/"
       sh 'mkdir', '-p', local
       sh "rsync #{rsync_opts} '#{remote}' '#{local}'"
@@ -122,15 +146,14 @@ namespace :html do
   desc "Checks HTML with htmlproofer, excludes offsite broken link checking"
   task :check_onsite do
     puts "⚡️  Checking HTML".pink
-    #sh "htmlproofer --disable-external --check-html #{@staging_dir} || true"
     sh "htmlproofer --disable-external --check-html --checks-to-ignore ScriptCheck,LinkCheck,HtmlCheck #{@staging_dir} > /dev/null || true"
     puts "☀️  Checked HTML".green
   end
 
-  desc "Checks HTML with htmlproofer, excludes offsite broken link checking"
+  desc "Checks links with htmlproofer"
   task :check_links do
     puts "Checking links".pink
-    sh "htmlproofer --verbose --checks-to-ignore ScriptCheck,ImageCheck #{@staging_dir} || true"
+    sh "htmlproofer --checks-to-ignore ScriptCheck,ImageCheck #{@staging_dir} || true"
     puts "Checked HTML".green
   end
 end

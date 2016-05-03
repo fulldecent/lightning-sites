@@ -5,13 +5,27 @@ class RakeBrowser
   attr_reader :tasks
   attr_reader :variables
   attr_reader :loads
+  @last_description = ''
+  @namespace = ''
 
   include Rake::DSL
+
+  def desc(description)
+    @last_description = description
+  end
+
+  def namespace(name=nil, &block) # :doc:
+    old = @namespace
+    @namespace = "#{name}:#{@namespace}"
+    yield(block)
+    @namespace = old
+  end
+
   def task(*args, &block)
     if args.first.respond_to?(:id2name)
-      @tasks << args.first.id2name
+      @tasks << "#{@namespace}" + args.first.id2name
     elsif args.first.keys.first.respond_to?(:id2name)
-      @tasks << args.first.keys.first.id2name
+      @tasks << "#{@namespace}" + args.first.keys.first.id2name
     end
   end
 
@@ -56,21 +70,24 @@ task :setup do
       puts '     No Rakefile found at ' + folder_rakefile
       puts "     To setup 🌩 Lightning Deployment, add a Rakefile to this directory"
       puts "     FIND AN EXAMPLE SITE RAKEFILE AT https://github.com/fulldecent/Sites".red
-      puts "     FIXME: Add automatic configurator here".red
       next
     end
 
     puts '     Found Rakefile at ' + folder_rakefile.yellow
     setup_is_good = true
     browser = RakeBrowser.new(f + "Rakefile")
-    browser.tasks.each do |task|
-      puts "       Task: " + task
-    end
 
     if browser.loads.include?('../common.rake')
       puts "     Common rakefile is loaded"
     else
       puts "     Common rakefile is not loaded".red
+      setup_is_good = false
+    end
+
+    if browser.variables[:@source_dir]
+      puts "     Source directory is " + f.yellow + browser.variables[:@source_dir].yellow
+    else
+      puts "     Source directory is not specified".red
       setup_is_good = false
     end
 
@@ -81,11 +98,8 @@ task :setup do
       setup_is_good = false
     end
 
-    if browser.variables[:@source_dir]
-      puts "     Source directory is " + f.yellow + browser.variables[:@source_dir].yellow
-    else
-      puts "     Source directory is not specified".red
-      setup_is_good = false
+    browser.tasks.each do |task|
+      puts "     Custom task: " + task
     end
 
     if setup_is_good
@@ -105,10 +119,6 @@ task :setup do
   end
 end
 
-#
-# COMMANDS TO SUB-RAKEFILES
-#
-
 desc "Run Rake task in each directory"
 task :distribute, :command do |t, args|
   require 'Shellwords'
@@ -119,76 +129,26 @@ task :distribute, :command do |t, args|
   end
 end
 
-desc "Find 404 responses on production servers"
-task :find_404 do
-  Rake::Task[:distribute].invoke("seo:find_404")
-end
+desc "Show all the tasks"
+task :default do
+  Rake::application.options.show_tasks = :tasks  # this solves sidewaysmilk problem
+  Rake::application.options.show_task_pattern = //
+  Rake::application.display_tasks_and_comments
 
-desc "Find 301 responses on production servers"
-task :find_301 do
-  Rake::Task[:distribute].invoke("seo:find_301")
-end
+  puts ""
+  puts "The following tasks can also run from any site folder."
+  puts "Or run them on all sites using: " + "distribute[command]".yellow
+  puts ""
+  puts "For descriptions, run " + "rake --tasks".yellow + " from any project folder."
+  puts "FIXME: add these descriptions directly here!!"
+  puts ""
 
-desc "Check for on-site HTML errors"
-task :html_check_onsite do
-  Rake::Task[:distribute].invoke("html:check_onsite")
-end
+  browser = RakeBrowser.new('common.rake')
 
-desc "Check for on-site HTML errors"
-task :html_check_links do
-  Rake::Task[:distribute].invoke("html:check_links")
-end
-
-
-
-### UPDATE THIS:
-desc "Run deliver in each directory"
-task :deliver do
-  sh 'for a in $(ls ./*/Rakefile); do (cd $(dirname $a); rake -f Rakefile deliver); done'
-end
-
-desc "Run status in each directory"
-task :status do
-  Dir.glob('./*/Rakefile').each do |f|
-    puts ("Processing " + File.dirname(f)).pink
-    sh 'cd ' + File.dirname(f) + '; rake -f Rakefile status'
+  browser.tasks.each do |task|
+    puts "  " + task
   end
 end
-
-
-
-
-
-
-
-###
-### update these:
-###
-
-#
-# CONFIGURATION
-#
-
-production_servers = ['SERVERA', 'SERVERB']
-
-desc "FIXME: Find errors on production servers"
-task :find_errors do
-  command = "cut -d' ' -f9- /var/log/httpd/*error.log | sort | uniq -c | sort -nr"
-  Rake::Task[:run_on_production_servers].invoke(command)
-end
-
-desc "FIXME: Find slow loading pages production servers"
-task :find_slow do
-  command = "awk '{if($NF>500000)print $7 }' /var/log/httpd/*ssl-access.log | sort | uniq -c | sort -rn | head"
-  Rake::Task[:run_on_production_servers].invoke(command)
-end
-
-desc "FIXME: Find sales from adwords on production servers"
-task :adwords_sales do
-  command = "bash /root/adwordssales.sh"
-  Rake::Task[:run_on_production_servers].invoke(command)
-end
-
 
 #
 # OTHER UTILITIES
@@ -224,11 +184,4 @@ class String
   def cyan
     colorize(36)
   end
-end
-
-desc "Show all the tasks"
-task :default do
-  Rake::application.options.show_tasks = :tasks  # this solves sidewaysmilk problem
-  Rake::application.options.show_task_pattern = //
-  Rake::application.display_tasks_and_comments
 end
