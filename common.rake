@@ -64,7 +64,10 @@ namespace :git do
 
   desc "Print the modified date for all files under source control"
   task :stale_report do
-    return unless source_dir_is_git
+    if !source_dir_is_git?
+      puts "There is no git directory, skipping"
+      next
+    end
     sh "cd #{@source_dir} && git ls-files -z | xargs -0 -n1 -I{} -- git log -1 --format='%ai {}' {} | cut -b 1-11,27-"
   end
 end
@@ -73,7 +76,7 @@ namespace :jekyll do
   desc "Build Jekyll site"
   task :build do
     puts 'Building Jekyll'.pink
-    sh "jekyll build --source '#{@source_dir}' --destination '#{@staging_dir}'"
+    sh "jekyll build --incremental --source '#{@source_dir}' --destination '#{@staging_dir}'"
     puts 'Built'.green
   end
 
@@ -115,7 +118,7 @@ namespace :rsync do
     raise '@production_backup_dir is not defined' unless defined? @production_backup_dir
     raise '@production_backup_targets is not defined' unless defined? @production_backup_targets
     puts "Backing up production".pink
-    rsync_opts = '-va --delete --exclude .git'
+    rsync_opts = '-vaL --delete --exclude .git'
     @production_backup_targets.each do |local_dir, remote_dir|
       remote = "#{remote_dir}"
       local = "#{@production_backup_dir}/#{local_dir}/"
@@ -130,7 +133,8 @@ namespace :seo do
   desc "Find 404s"
   task :find_404 do
     puts "Finding 404 errors".pink
-    sh "zgrep -r ' 404 ' '#{@production_backup_dir}/logs'"
+    sh 'zgrep', '-r', ' 404 ', "#{@production_backup_dir}/logs"
+#    sh "zgrep -r ' 404 ' '#{@production_backup_dir}/logs'"
     puts "Found".green
   end
 
@@ -152,16 +156,20 @@ namespace :html do
 
   desc "Checks links with htmlproofer"
   task :check_links do
-    puts "Checking links".pink
+    puts "⚡️  Checking links".pink
     sh "htmlproofer --checks-to-ignore ScriptCheck,ImageCheck #{@staging_dir} || true"
-    puts "Checked HTML".green
+    puts "☀️  Checked HTML".green
+  end
+
+  desc "Find all external links"
+  task :find_external_links do
+    puts "⚡️  Finding all external links".pink
+    sh "egrep -oihR '\\b(https?|ftp|file)://[-A-Z0-9+&@#/%?=~_|!:,.;]*[A-Z0-9+&@#/%=~_|]' #{@staging_dir} || true"
   end
 end
 
-
-
 desc "Delete all local code and backups"
-task :clean do
+task :distclean do
   puts "Deleting all local code and backups".pink
   FileUtils.rm_rf(@source_dir)
   FileUtils.rm_rf(@staging_dir)
