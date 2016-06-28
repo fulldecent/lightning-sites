@@ -3,13 +3,22 @@
 *Lightning Sites* gives you beautifully simple deployment for your ~/Sites folders. We support all deployment setups, such as:
 
  * Single developer and push when done
-       [LOCALHOST] ----deploy---> [PRODUCTION]
+
+    ```
+    [LOCALHOST] ----deploy---> [PRODUCTION]
+    ```
 
  * The way you shouldn't edit PHP websites (but people do it anyway)
-       [LOCALHOST] <---promote/demote---> [PRODUCTION]
+
+    ```
+    [LOCALHOST] <---promote/demote---> [PRODUCTION]
+    ```
 
  * Version-controlled with a build step
-       [SCM] <-push/pull-> [LOCALHOST] --build-> [STAGING] --deploy-> [QA/PRODUCTION]
+
+    ```
+    [SCM] <-push/pull-> [LOCALHOST] --build-> [STAGING] --deploy-> [QA/PRODUCTION]
+    ```
 
 You set up each site with a simple rakefile and customize as necessary. Then you can perform tasks on multiple sites quickly, including validation, backups and even SEO tasks.
 
