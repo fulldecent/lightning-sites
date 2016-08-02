@@ -27,6 +27,12 @@ You set up each site with a simple rakefile and customize as necessary. Then you
 
 **Just clone this repository into your ~/Sites directory and run `rake setup`.**
 
+```bash
+$ git clone https://github.com/fulldecent/Sites.git
+$ cd Sites/
+$ gem install bundler
+$ bundle install
+```
 Each website you manage will live in a separate directory in the Sites folder. In each folder, add a `Rakefile` like the following:
 
 ```rake
