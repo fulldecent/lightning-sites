@@ -150,21 +150,21 @@ namespace :html do
   desc "Checks HTML with htmlproofer, excludes offsite broken link checking"
   task :check_onsite do
     puts "⚡️  Checking HTML".pink
-    sh "htmlproofer --disable-external --check-html --checks-to-ignore ScriptCheck,LinkCheck,HtmlCheck #{@staging_dir} > /dev/null || true"
+    sh "bundle exec htmlproofer --disable-external --check-html --checks-to-ignore ScriptCheck,LinkCheck,HtmlCheck #{@staging_dir} > /dev/null || true"
     puts "☀️  Checked HTML".green
   end
 
   desc "Checks links with htmlproofer"
   task :check_links do
     puts "⚡️  Checking links".pink
-    sh "htmlproofer --checks-to-ignore ScriptCheck,ImageCheck #{@staging_dir} || true"
+    sh "bundle exec htmlproofer --checks-to-ignore ScriptCheck,ImageCheck #{@staging_dir} || true"
     puts "☀️  Checked HTML".green
   end
 
   desc "Find all external links"
   task :find_external_links do
     puts "⚡️  Finding all external links".pink
-    sh "egrep -oihR '\\b(https?|ftp|file)://[-A-Z0-9+&@#/%?=~_|!:,.;]*[A-Z0-9+&@#/%=~_|]' #{@staging_dir} || true"
+    sh "egrep -oihR '\\b(https?|ftp|file)://[-A-Z0-9+@/%=~_|!:,.;]*[A-Z0-9+@/%=~_|]' #{@staging_dir} || true"
   end
 end
 
