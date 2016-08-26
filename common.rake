@@ -92,7 +92,7 @@ namespace :rsync do
   desc "Bring deployed web server files local"
   task :pull do
     raise '@production_dir is not defined' unless defined? @production_dir
-    raise '@staging_dir is not defined' unless defined? @source_dir
+    raise '@staging_dir is not defined' unless defined? @staging_dir
     puts 'Pulling website'.pink
     rsync_opts = '-vr --delete --exclude .git --exclude cache'
     remote = "#{@production_dir}/"
