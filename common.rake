@@ -70,6 +70,16 @@ namespace :git do
     end
     sh "cd #{@source_dir} && git ls-files -z | xargs -0 -n1 -I{} -- git log -1 --format='%ai {}' {} | cut -b 1-11,27-"
   end
+
+  desc "Save the commit hash to VERSION on the staging directory"
+  task :save_version do
+    if !source_dir_is_git?
+      puts "There is no git directory, skipping"
+      next
+    end
+    hash = `cd #{@source_dir} && git rev-parse HEAD`.chomp
+    sh "cd '#{@staging_dir}'; echo '#{hash}' > VERSION"
+  end
 end
 
 namespace :jekyll do
@@ -104,7 +114,7 @@ namespace :rsync do
   desc "Push local files to production web server"
   task :push do
     raise '@production_dir is not defined' unless defined? @production_dir
-    raise '@staging_dir is not defined' unless defined? @source_dir
+    raise '@staging_dir is not defined' unless defined? @staging_dir
     puts 'Pushing website'.pink
     rsync_opts = '-r -c -v --ignore-times --chmod=ugo=rwX --delete --exclude .git --exclude cache'
     remote = "#{@production_dir}/"
