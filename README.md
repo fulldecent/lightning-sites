@@ -1,102 +1,41 @@
-# :cloud: Lightning Sites
+# LightningSites
 
-*Lightning Sites* gives you beautifully simple deployment for your ~/Sites folders, inspired by [Fastlane](https://fastlane.tools/). We support all deployment setups, such as:
+Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/lightning_sites`. To experiment with that code, run `bin/console` for an interactive prompt.
 
- * Single developer and push when done
+TODO: Delete this and the text above, and describe your gem
 
-    ```
-    [LOCALHOST] ----deploy---> [PRODUCTION]
-    ```
+## Installation
 
- * The way you shouldn't edit PHP websites (but people do it anyway)
+Add this line to your application's Gemfile:
 
-    ```
-    [LOCALHOST] <---promote/demote---> [PRODUCTION]
-    ```
-
- * Version-controlled with a build step
-
-    ```
-    [SCM] <-push/pull-> [LOCALHOST] --build-> [STAGING] --deploy-> [QA/PRODUCTION]
-    ```
-
-You set up each site with a simple rakefile and customize as necessary. Then you can perform tasks on multiple sites quickly, including validation, backups and even SEO tasks.
-
-
-# How to set it up
-
-**Just clone this repository into your ~/Sites directory and run `rake setup`.**
-
-```bash
-git clone https://github.com/fulldecent/Sites.git
-cd Sites/
-gem install bundler
-bundle install
-rake setup
-```
-Each website you manage will live in a separate directory in the Sites folder. In each folder, add a `Rakefile` like the following:
-
-```rake
-# Uses rake tasks from https://github.com/fulldecent/Sites
-load '../common.rake'
-
-production_server = '911coned.com'
-production_user = 'medtra10'
-production_base = "#{production_user}@#{production_server}:"
-@production_dir = "#{production_base}www"
-@production_backup_dir = 'production_backup'
-@production_backup_targets =
-{
-  'www' => "#{production_base}www",
-  'logs' => "#{production_base}logs",
-  'tls' => "#{production_base}/etc/pki/tls/",
-  'mysql' => "#{production_base}/var/lib/mysqlbackup/default/newest",
-  'postfix' => "#{production_base}/etc/postfix"
-}
-
-@source_dir = 'source'
-@staging_dir = 'staging'
-
-@git_clone_url = 'git@github.com:fulldecent/mtssites.git'
-@git_branch = production_server
-
-desc "Run all build and deployment tasks, for continuous delivery"
-task :deploy => ['git:pull', 'jekyll:build', 'rsync:push']
+```ruby
+gem 'lightning_sites'
 ```
 
-# How to use it
+And then execute:
 
-Now you can deploy a site with your new task defined above:
+    $ bundle
 
-```bash
-rake deploy
-```
+Or install it yourself as:
 
-And you can use these other fun built-in tasks. Your `deploy` task above simply composites some of these tasks.
+    $ gem install lightning_sites
 
-```bash
-rake default                   # Show all the tasks
-rake distclean                 # Delete all local code and backups
-rake git:clone                 # Download and create a copy of code from git server
-rake git:pull                  # Fetch and merge from git server, using current checked out branch
-rake git:stale_report          # Print the modified date for all files under source control
-rake git:status                # Shows status of all files in git repo
-rake html:check_links          # Checks links with htmlproofer
-rake html:check_onsite         # Checks HTML with htmlproofer, excludes offsite broken link checking
-rake html:find_external_links  # Find all external links
-rake jekyll:build              # Build Jekyll site
-rake jekyll:test               # Run a Jekyll test server
-rake rsync:backup              # Backup production
-rake rsync:pull                # Bring deployed web server files local
-rake rsync:push                # Push local files to production web server
-rake seo:find_301              # Find 301s
-rake seo:find_404              # Find 404s
-```
+## Usage
 
-Additionally you can run tasks on all sites at once. Just run these directly from your ~/Sites folder:
+TODO: Write usage instructions here
 
-```bash
-rake default                   # Show all the tasks
-rake distribute[command]       # Run Rake task in each directory
-rake setup                     # Review and configure each directory in here
-```
+## Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/William Entriken/lightning_sites.
+
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
