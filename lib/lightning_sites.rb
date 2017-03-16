@@ -87,7 +87,7 @@ namespace :jekyll do
   task :build do
     create_build_dir
     puts 'Building Jekyll'.blue
-    sh "jekyll build --incremental --source '#{@source_dir}' --destination '#{@build_dir}'"
+    sh "bundle exec jekyll build --incremental --source '#{@source_dir}' --destination '#{@build_dir}'"
     puts 'Built'.green
   end
 
@@ -95,7 +95,7 @@ namespace :jekyll do
   task :test do
     create_build_dir
     puts 'Running test server'.blue
-    sh "jekyll serve --source '#{@source_dir}' --destination '#{@build_dir}'"
+    sh "bundle exec jekyll serve --source '#{@source_dir}' --destination '#{@build_dir}'"
   end
 end
 
