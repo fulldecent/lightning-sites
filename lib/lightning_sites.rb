@@ -3,32 +3,32 @@ require 'colorize'
 # http://stackoverflow.com/a/11320444/300224
 Rake::TaskManager.record_task_metadata = true
 
-##
-## EVERY SITE MUST DEFINE THESE VARIABLES:
-##
-@source_dir = 'source'       # Editable source code
-@build_dir = 'build'         # Built HTML code
-##
-##
-## REQUIRED VARIABLES FOR DEPLOYMENT:
-##
-## @production_dir             A local or remote directory (rsync format) to deploy to
-##                             Good example: 'horseslov@172.16.11.23:/www'
-## @production_backup_targets  Hash of {name => what_should_backup_to_there}
-##                             Good example: {'logs' => 'horseslov@172.16.11.23:/logs', ...}
-@production_backup_dir = 'production_backups'
+################################################################################
+## Your Rakefile can override these variables
+################################################################################
+@source_dir = 'source'       # Editable source code, preferrably in git repo
+@build_dir = 'BUILD'         # Built HTML code
+@backup_dir = 'BACKUPS'      # Local home for backups of remote server
+@remote_dir = '/dev/null'    # Your remote server, use rsync format
+@backup_targets = {}         # Hash from local name to remote directory
+                             # uses rsync naming format, example:
+                             # {
+                             #   'www' => 'horseslov@172.16.11.23:/www',
+                             #   'logs' => 'horseslov@172.16.11.23:/logs'
+                             # }
+@build_excludes = [          # Files you do NOT want copied from SOURCE to BUILD
+  'Gemfile',                 # use rsync format
+  'Gemfile.lock',
+  '.bundle',
+  '.git',
+  '/tmp'
+]
 
-##
-## COLOR SCHEME
-##
-## ...
-##
-
-module LightningSites
-  # Your code goes here...
+def create_build_dir (build_dir=@build_dir)
+  FileUtils.mkdir_p build_dir
+  #TODO: output if directory did not exist and we created it
 end
 
-# Note: this stuff works even if only your SOURCE_DIR is checked into git
 namespace :git do
   def source_dir_is_git?
     return false if !File.directory?(@source_dir)
@@ -37,9 +37,13 @@ namespace :git do
 
   desc "Incorporate changes from the remote repository into the current branch"
   task :pull do
-    puts 'Pulling git'.blue
+    if !source_dir_is_git?
+      puts "There is no git directory, skipping"
+      next
+    end
+    puts '⚡️ Pulling git'.blue
     sh "cd '#{@source_dir}'; git pull"
-    puts 'Pulled'.green
+    puts '✅ Pulled'.green
   end
 
   desc "Displays paths that have differences between the index file and the current HEAD commit"
@@ -58,8 +62,10 @@ namespace :git do
       puts "There is no git directory, skipping"
       next
     end
+    puts '📋 Here is the modification date for each file'.blue
+    sh "cd #{@source_dir} && git ls-files -z | xargs -0 -n1 -I{} -- git log -1 --date=short --format='%ad {}' {}", noop: true
     puts 'Modified   File'.blue
-    sh "cd #{@source_dir} && git ls-files -z | xargs -0 -n1 -I{} -- git log -1 --date=short --format='%ad {}' {}"
+    sh "cd #{@source_dir} && git ls-files -z | xargs -0 -n1 -I{} -- git log -1 --date=short --format='%ad {}' {}", verbose: false
   end
 
   desc "Save the commit hash to VERSION in the build directory"
@@ -70,7 +76,7 @@ namespace :git do
     end
     hash = `cd #{@source_dir} && git rev-parse HEAD`.chomp
     local_changes = `git diff --shortstat`.chomp.length
-    File.write("#{@build_dir}/VERSION", local_changes ? "#{hash}*\n" : "#{hash}*")
+    File.write(@build_dir + '/VERSION', local_changes ? "#{hash}*\n" : "#{hash}*")
     puts 'Saved git version to VERSION file'.green
   end
 end
@@ -79,6 +85,7 @@ end
 namespace :jekyll do
   desc "Build Jekyll site"
   task :build do
+    create_build_dir
     puts 'Building Jekyll'.blue
     sh "jekyll build --incremental --source '#{@source_dir}' --destination '#{@build_dir}'"
     puts 'Built'.green
@@ -86,6 +93,7 @@ namespace :jekyll do
 
   desc "Run a Jekyll test server"
   task :test do
+    create_build_dir
     puts 'Running test server'.blue
     sh "jekyll serve --source '#{@source_dir}' --destination '#{@build_dir}'"
   end
@@ -93,51 +101,51 @@ end
 
 # Interact with a production environment
 namespace :rsync do
-  desc "Copy the source directory to the build directory"
+  desc "Copy the source directory to the build directory, excluding some files"
   task :copy_build do
     puts 'Copying source directory to build directory'.blue
-    rsync_opts = '--archive --delete --exclude .git'
-    from = "#{@source_dir}/"
-    to = "#{@build_dir}/"
-    sh "rsync #{rsync_opts} '#{from}' '#{to}'"
+    rsync_opts = %w[--archive --delete]
+    from = @source_dir + '/'
+    to = @build_dir + '/'
+    @build_excludes.each do |exclude|
+      rsync_opts << '--exclude'
+      rsync_opts << exclude
+    end
+    sh 'rsync', *rsync_opts, from, to
     puts 'Copied'.green
   end
 
-  desc "Bring deployed web server files local"
-  task :pull do
-    raise '@production_dir is not defined' unless defined? @production_dir
-    raise '@build_dir is not defined' unless defined? @build_dir
-    puts 'Pulling website'.blue
-    rsync_opts = '-vr --delete --exclude .git --exclude cache'
-    remote = "#{@production_dir}/"
-    local = "#{@build_dir}/"
-    sh "rsync #{rsync_opts} '#{remote}' '#{local}'"
+  desc "Bring remote files to build directory (use rsync-style paths)"
+  task :pull, [:remote] do |t, args|
+    args.with_defaults(:remote => @remote_dir)
+    puts 'Pulling website from remote'.blue
+    rsync_opts = %w[-vr --delete]
+    from = args.remote + '/'
+    to = @build_dir + '/'
+    sh 'rsync', *rsync_opts, from, to
     puts 'Pulled'.green
   end
 
-  desc "Push local files to production web server"
-  task :push do
-    raise '@production_dir is not defined' unless defined? @production_dir
-    raise '@build_dir is not defined' unless defined? @build_dir
-    puts 'Pushing website'.blue
-    rsync_opts = '-r -c -v --ignore-times --chmod=ugo=rwX --delete --exclude .git --exclude cache'
-    remote = "#{@production_dir}/"
-    local = "#{@build_dir}/"
-    sh "rsync #{rsync_opts} '#{local}' '#{remote}'"
+  desc "Send build directory to remote server (use rsync-style paths)"
+  task :push, [:remote] do |t, args|
+    args.with_defaults(:remote => @remote_dir)
+    puts 'Pushing website to remote'.blue
+    rsync_opts = %w[-r -c -v --ignore-times --chmod=ugo=rwX --delete]
+    from = @build_dir + '/'
+    to = args.remote + '/'
+    sh 'rsync', *rsync_opts, from, to
     puts 'Pushed'.green
   end
 
-  desc "Backup production"
+  desc "Backup items from remote server"
   task :backup do
-    raise '@production_backup_dir is not defined' unless defined? @production_backup_dir
-    raise '@production_backup_targets is not defined' unless defined? @production_backup_targets
-    puts "Backing up production".blue
-    rsync_opts = '-vaL --delete --exclude .git'
-    @production_backup_targets.each do |local_dir, remote_dir|
-      remote = "#{remote_dir}"
-      local = "#{@production_backup_dir}/#{local_dir}/"
-      sh 'mkdir', '-p', local
-      sh "rsync #{rsync_opts} '#{remote}' '#{local}'"
+    puts "Backing up remote server".blue
+    rsync_opts = %w[-vaL --delete --exclude .git]
+    @backup_targets.each do |local_dir, remote_dir|
+      from = remote_dir
+      to = @backup_dir + '/' + local_dir
+      FileUtils.mkdir_p to
+      sh 'rsync', *rsync_opts, from, to
     end
     puts "Backup complete".green
   end
@@ -148,7 +156,7 @@ namespace :seo do
   desc "Find 404s"
   task :find_404 do
     puts "Finding 404 errors".blue
-    sh 'zgrep', '-r', ' 404 ', "#{@production_backup_dir}/logs"
+    sh 'zgrep', '-r', ' 404 ', "#{@backup_dir}/logs"
 #    sh "zgrep -r ' 404 ' '#{@production_backup_dir}/logs'"
     puts "Found".green
   end
@@ -156,24 +164,30 @@ namespace :seo do
   desc "Find 301s"
   task :find_301 do
     puts "Finding 301 errors".blue
-    sh "zgrep -r ' 301 ' '#{@production_backup_dir}/logs'"
+    sh "zgrep -r ' 301 ' '#{@backup_dir}/logs'"
     puts "Found".green
   end
 end
 
 # testing stuff for built html folder
 namespace :html do
-  desc "Checks HTML with htmlproofer, excludes offsite broken link checking"
-  task :check_onsite do
+  desc "Checks everything with htmlproofer that is reasonable to check"
+  task :check do
     puts "⚡️  Checking HTML".blue
-    sh "bundle exec htmlproofer --disable-external --check-html --checks-to-ignore ScriptCheck,LinkCheck,HtmlCheck #{@build_dir} > /dev/null || true"
+    sh "bundle exec htmlproofer --check-sri --check-external-hash --check-html --check-img-http --check-opengraph --enforce-https --timeframe 6w #{@build_dir}" do
+      puts 'Errors found'
+      exit(1)
+    end
     puts "☀️  Checked HTML".green
   end
 
-  desc "Checks links with htmlproofer"
-  task :check_links do
-    puts "⚡️  Checking links".blue
-    sh "bundle exec htmlproofer --checks-to-ignore ScriptCheck,ImageCheck #{@build_dir} || true"
+  desc "Checks HTML with htmlproofer, skip external links"
+  task :check_onsite do
+    puts "⚡️  Checking HTML, skipping external links".blue
+    sh "bundle exec htmlproofer --disable-external --check-sri --check-html --check-opengraph --enforce-https #{@build_dir}" do
+      puts 'Errors found'
+      exit(1)
+    end
     puts "☀️  Checked HTML".green
   end
 
@@ -188,16 +202,7 @@ desc "Delete all built code"
 task :clean do
   puts "Deleting all built code".red
   FileUtils.rm_rf(@build_dir)
-  FileUtils.rm_rf(@production_backup_dir)
-  puts "Deleting complete".green
-end
-
-desc "Delete everything that can be regenerated"
-task :distclean do
-  puts "Deleting all built code".red
-  FileUtils.rm_rf(@build_dir)
-  puts "Deleting all productions backups".red
-  FileUtils.rm_rf(@production_backup_dir)
+  FileUtils.rm_rf(@backup_dir)
   puts "Deleting complete".green
 end
 
