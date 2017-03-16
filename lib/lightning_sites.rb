@@ -6,7 +6,7 @@ Rake::TaskManager.record_task_metadata = true
 ################################################################################
 ## Your Rakefile can override these variables
 ################################################################################
-@source_dir = 'source'       # Editable source code, preferrably in git repo
+@source_dir = '.'            # Editable source code, preferrably in git repo
 @build_dir = 'BUILD'         # Built HTML code
 @backup_dir = 'BACKUPS'      # Local home for backups of remote server
 @remote_dir = '/dev/null'    # Your remote server, use rsync format
@@ -81,7 +81,6 @@ namespace :git do
   end
 end
 
-## don't use this right now
 namespace :jekyll do
   desc "Build Jekyll site"
   task :build do
@@ -151,32 +150,33 @@ namespace :rsync do
   end
 end
 
-# beta stuff
+# A few nice things you might like
 namespace :seo do
   desc "Find 404s"
   task :find_404 do
     puts "Finding 404 errors".blue
     sh 'zgrep', '-r', ' 404 ', "#{@backup_dir}/logs"
-#    sh "zgrep -r ' 404 ' '#{@production_backup_dir}/logs'"
     puts "Found".green
   end
 
   desc "Find 301s"
   task :find_301 do
     puts "Finding 301 errors".blue
-    sh "zgrep -r ' 301 ' '#{@backup_dir}/logs'"
+    sh 'zgrep', '-r', ' 301 ', "#{@backup_dir}/logs"
     puts "Found".green
   end
 end
 
-# testing stuff for built html folder
+# Validation for built html folder
 namespace :html do
   desc "Checks everything with htmlproofer that is reasonable to check"
   task :check do
     puts "⚡️  Checking HTML".blue
-    sh "bundle exec htmlproofer --check-sri --check-external-hash --check-html --check-img-http --check-opengraph --enforce-https --timeframe 6w #{@build_dir}" do
-      puts 'Errors found'
-      exit(1)
+    sh "bundle exec htmlproofer --check-sri --check-external-hash --check-html --check-img-http --check-opengraph --enforce-https --timeframe 6w #{@build_dir}" do |ok, res|
+      if !ok
+        puts 'Errors found'
+        exit(1)
+      end
     end
     puts "☀️  Checked HTML".green
   end
