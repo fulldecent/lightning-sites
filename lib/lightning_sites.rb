@@ -104,7 +104,7 @@ namespace :rsync do
   desc "Copy the source directory to the build directory, excluding some files"
   task :copy_build do
     puts 'Copying source directory to build directory'.blue
-    rsync_opts = %w[--archive --delete]
+    rsync_opts = %w[--archive --delete --delete-excluded]
     from = @source_dir + '/'
     to = @build_dir + '/'
     excludes = @build_excludes
