@@ -106,7 +106,10 @@ namespace :rsync do
     rsync_opts = %w[--archive --delete]
     from = @source_dir + '/'
     to = @build_dir + '/'
-    @build_excludes.each do |exclude|
+    excludes = @build_excludes
+    excludes << @source_dir
+    excludes << @build_dir
+    excludes.each do |exclude|
       rsync_opts << '--exclude'
       rsync_opts << exclude
     end
