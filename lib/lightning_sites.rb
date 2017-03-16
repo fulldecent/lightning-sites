@@ -21,6 +21,7 @@ Rake::TaskManager.record_task_metadata = true
   'Gemfile.lock',
   '.bundle',
   '.git',
+  'vendor',
   '/tmp'
 ]
 
@@ -107,7 +108,7 @@ namespace :rsync do
     from = @source_dir + '/'
     to = @build_dir + '/'
     excludes = @build_excludes
-    excludes << @source_dir
+    excludes << @backup_dir
     excludes << @build_dir
     excludes.each do |exclude|
       rsync_opts << '--exclude'
