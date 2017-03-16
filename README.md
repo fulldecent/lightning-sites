@@ -38,6 +38,28 @@ There is a full example of a website using lightning-sites at https://github.com
 Also create a file named `Rakefile` with these contents:
 
 ```ruby
+abort('Please run this using `bundle exec rake`') unless ENV["BUNDLE_BIN_PATH"]
+#require 'lightning_sites' # https://github.com/fulldecent/lightning-sites
+load 'LIGHTNINGSITES-BETA.rake'
+
+@build_excludes.push('README.md','LICENSE','CONTRIBUTING.md')
+production_base = 'horseslov@172.16.11.23:'
+@remote_dir = "#{production_base}www"
+@backup_targets = {
+  'www' => "#{production_base}www",
+  'logs' => "#{production_base}logs"
+}
+
+desc "Perform website build"
+task :build => ['rsync:copy_build', 'git:save_version']
+
+desc "Perform all testing on the built HTML"
+task :test => [:build, 'html:check']
+
+desc "Publish website to productions server"
+task :publish => ['rsync:push']
+
+
 # Uses rake tasks from https://github.com/fulldecent/Sites
 abort('Please run this using `bundle exec rake`') unless ENV["BUNDLE_BIN_PATH"]
 require 'lightning_sites'
@@ -46,54 +68,26 @@ require 'shellwords'
 
 ##
 ## SETUP BUILD TASK
-##
+abort('Please run this using `bundle exec rake`') unless ENV["BUNDLE_BIN_PATH"]
+#require 'lightning_sites' # https://github.com/fulldecent/lightning-sites
+load 'LIGHTNINGSITES-BETA.rake'
 
-desc "Perform website build"
-task :build do
-  puts ''
-  puts ' 🔨  Building your website'.blue
-  puts ''
-  Rake::Task['rsync:copy_build'].invoke
-  Rake::Task['git:save_version'].invoke
-end
-
-
-##
-## SETUP DEPLOYMENT VARIABLES
-##
+@build_excludes.push('README.md','LICENSE','CONTRIBUTING.md')
 production_base = 'horseslov@172.16.11.23:'
-@production_dir = "#{production_base}www"
-@production_backup_targets = {
+@remote_dir = "#{production_base}www"
+@backup_targets = {
   'www' => "#{production_base}www",
   'logs' => "#{production_base}logs"
 }
 
+desc "Perform website build"
+task :build => ['rsync:copy_build', 'git:save_version']
 
-##
-## CONFIGURE TESTING TASKS
-## See more options at https://github.com/fulldecent/Sites
-##
+desc "Perform all testing on the built HTML"
+task :test => [:build, 'html:check']
 
-desc "Perform validation testing for this website's code"
-task :test => [] do
-  puts "To run even more tests, which may be expensive, also run text_extensive"
-end
-
-desc "Perform more tests with extensive time, bandwidth or other cost"
-task :text_extensive do
-
-end
-
-
-##
-## CONFIGURE DEPLOYMENT TASKS
-## See more options at https://github.com/fulldecent/Sites
-##
-
-desc "This is a task using code from the included library"
-task :deploy => ['git:helloworld']
-
-#task :default => :deploy
+desc "Publish website to productions server"
+task :publish => ['rsync:push']
 ```
 
 
@@ -102,10 +96,12 @@ task :deploy => ['git:helloworld']
 Now you can deploy a site with your new task defined above:
 
 ```bash
-rake deploy
+bundle exec rake build
+bundle exec rake test
+bundle exec rake publish
 ```
 
-And you can use these other fun built-in tasks. Your `deploy` task above simply composites some of these tasks.
+And you can use these other fun built-in tasks. Tasks in your `Rakefile` simply composite some of these tasks.
 
 ```bash
 rake default                   # Show all the tasks
@@ -124,12 +120,4 @@ rake rsync:pull                # Bring deployed web server files local
 rake rsync:push                # Push local files to production web server
 rake seo:find_301              # Find 301s
 rake seo:find_404              # Find 404s
-```
-
-Additionally you can run tasks on all sites at once. Just run these directly from your ~/Sites folder:
-
-```bash
-rake default                   # Show all the tasks
-rake distribute[command]       # Run Rake task in each directory
-rake setup                     # Review and configure each directory in here
 ```
