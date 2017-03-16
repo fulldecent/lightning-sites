@@ -17,10 +17,13 @@ Rake::TaskManager.record_task_metadata = true
                              #   'logs' => 'horseslov@172.16.11.23:/logs'
                              # }
 @build_excludes = [          # Files you do NOT want copied from SOURCE to BUILD
-  'Gemfile',                 # use rsync format
+  'Rakefile',                # use rsync format
+  'Gemfile',
   'Gemfile.lock',
   '.bundle',
   '.git',
+  '.gitignore',
+  '.travil.yml',
   'vendor',
   '/tmp'
 ]
