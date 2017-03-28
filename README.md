@@ -25,20 +25,28 @@ You set up each site with a simple rakefile and customize as necessary. Then you
 
 # Instant setup
 
-**The easiest way to to use Lightning Sites is to [clone the example repository](https://github.com/fulldecent/html-website-template).** It is a one-page website, about horses, and includes everything a modern website should have. Click the link and see the features checklist if you are interested.
+**The easiest way to to use Lightning Sites is to [clone the example repository](https://github.com/fulldecent/html-website-template).** It is a one-page website, about horses, and includes everything a modern website should have. You do NOT need to be a programmer to use that template, it is very end-user friendly. Click the link and see the features checklist if you are interested.
 
 # Slow setup
 
-Run these commands to setup your project:
+Create a `Gemfile` and add `lightning_sites` to it
+
+```ruby
+source "https://rubygems.org"
+
+gem "lightning_sites"
+```
+
+And install with:
 
 ```sh
 gem install bundler
 bundle init; echo "gem 'lightning_sites'" >> Gemfile
 export NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-bundle install --path vendor/bundle
+bundle install
 ```
 
-Next, create a `Rakefile` with these contents:
+Next, create a `Rakefile` by starting with this and editing server credentials:
 
 ```ruby
 abort('Please run this using `bundle exec rake`') unless ENV["BUNDLE_BIN_PATH"]
@@ -63,7 +71,9 @@ desc "Publish website to productions server"
 task :publish => ['rsync:push']
 ```
 
-Tweak the `Rakefile` as you like.
+* Update `.gitignore` to include `tmp`, `BUILD/` and `BACKUP/`
+* Update `_travis.yml` to call `bundle exec rake test`, [see full example here](https://github.com/fulldecent/html-website-template/blob/master/.travis.yml)
+* Update Jekyll excludes in `_config.yml`, if you have one, and exclude these new files and gitignores
 
 # How to use it
 
