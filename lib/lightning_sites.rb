@@ -1,4 +1,4 @@
-require 'colorize'
+require 'html-proofer'
 
 # http://stackoverflow.com/a/11320444/300224
 Rake::TaskManager.record_task_metadata = true
@@ -179,23 +179,34 @@ namespace :html do
   desc "Checks everything with htmlproofer that is reasonable to check"
   task :check do
     puts "⚡️  Checking HTML".blue
-    sh "bundle exec htmlproofer --check-sri --check-external-hash --check-html --check-img-http --check-opengraph --enforce-https --timeframe 6w #{@build_dir}" do |ok, res|
-      if !ok
-        puts 'Errors found'
-        exit(1)
-      end
-    end
-    puts "☀️  Checked HTML".green
+    options = {
+        :check_sri => true,
+        :check_external_hash => true,
+        :check_html => true,
+        :check_img_http => true,
+        :check_opengraph => true,
+        :enforce_https => true,
+        :cache => {
+          :timeframe => '6w'
+        }
+    }
+    HTMLProofer.check_directory("#{@build_dir}", options).run
   end
 
   desc "Checks HTML with htmlproofer, skip external links"
   task :check_onsite do
     puts "⚡️  Checking HTML, skipping external links".blue
-    sh "bundle exec htmlproofer --disable-external --check-sri --check-html --check-opengraph --enforce-https #{@build_dir}" do
-      puts 'Errors found'
-      exit(1)
-    end
-    puts "☀️  Checked HTML".green
+    options = {
+        :disable_external => true,
+        :check_sri => true,
+        :check_html => true,
+        :check_opengraph => true,
+        :enforce_https => true,
+        :cache => {
+            :timeframe => '6w'
+        }
+    }
+    HTMLProofer.check_directory("#{@build_dir}", options).run
   end
 
   desc "Find all external links"
