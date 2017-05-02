@@ -214,6 +214,12 @@ namespace :html do
     puts "⚡️  Finding all external links".blue
     sh "egrep -oihR '\\b(https?|ftp|file)://[-A-Z0-9+@/%=~_|!:,.;]*[A-Z0-9+@/%=~_|]' #{@build_dir} || true"
   end
+
+  desc "Find old versions of Bootstrap"
+  task :web_puc do
+    puts "⚡️  Checking for old Bootstrap dependencies".blue
+    sh "bundle exec web-puc #{@build_dir}"
+  end
 end
 
 desc "Delete all built code"
