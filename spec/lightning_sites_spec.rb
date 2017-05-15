@@ -5,7 +5,9 @@ RSpec.describe LightningSites do
     expect(LightningSites::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "validate bad sitemap" do
+    build_dir = "#{FIXTURES_DIR}/sitemap_broken"
+    expect { Rake::Task['html:validate_sitemap'].invoke(build_dir) }
+        .to output(%r{Premature end of data in tag urlset line 3}).to_stdout
   end
 end

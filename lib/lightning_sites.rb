@@ -1,4 +1,5 @@
 require 'html-proofer'
+require 'rake'
 
 # http://stackoverflow.com/a/11320444/300224
 Rake::TaskManager.record_task_metadata = true
@@ -219,6 +220,22 @@ namespace :html do
   task :web_puc do
     puts "⚡️  Checking for old Bootstrap dependencies".blue
     sh "bundle exec web-puc #{@build_dir}"
+  end
+
+  desc "Validate sitemap"
+  task :validate_sitemap, :sitemap_path do |t, args|
+    args.with_defaults(:sitemap_path => "#{@build_dir}")
+    sitemap_path = "#{args[:sitemap_path]}/sitemap.xml"
+    puts "⚡️  Validating sitemap".blue
+    unless File.exist? sitemap_path
+      puts "Sitemap.xml doesn't exists in #{sitemap_path}".red
+    end
+    begin
+      File.open(sitemap_path) { |f| Nokogiri::XML(f) { |config| config.strict } }
+      puts "Validation complete".green
+    rescue Nokogiri::XML::SyntaxError => msg
+      puts "#{msg}".red
+    end
   end
 end
 
