@@ -1,4 +1,5 @@
 require 'html-proofer'
+require 'mail_to_awesome'
 require 'rake'
 
 # http://stackoverflow.com/a/11320444/300224
@@ -203,6 +204,18 @@ namespace :html do
         :check_html => true,
         :check_opengraph => true,
         :enforce_https => true,
+        :cache => {
+            :timeframe => '6w'
+        }
+    }
+    HTMLProofer.check_directory("#{@build_dir}", options).run
+  end
+
+  desc "Checks mailto links with htmlproofer custom test"
+  task :check_mailto_awesome do
+    puts "⚡️  Checking mailto links".blue
+    options = {
+        :check_mailto_awesome => true,
         :cache => {
             :timeframe => '6w'
         }
