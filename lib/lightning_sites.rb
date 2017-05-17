@@ -250,6 +250,7 @@ namespace :html do
     puts "⚡️  Validating sitemap".blue
     unless File.exist? sitemap_path
       puts "Sitemap.xml doesn't exists in #{sitemap_path}".red
+      return
     end
     begin
       File.open(sitemap_path) { |f| Nokogiri::XML(f) { |config| config.strict } }
