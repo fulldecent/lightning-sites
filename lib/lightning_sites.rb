@@ -192,7 +192,11 @@ namespace :html do
           :timeframe => '6w'
         }
     }
-    HTMLProofer.check_directory("#{@build_dir}", options).run
+    begin
+      HTMLProofer.check_directory("#{@build_dir}", options).run
+    rescue => msg
+      puts "#{msg}"
+    end
   end
 
   desc "Checks HTML with htmlproofer, skip external links"
@@ -208,7 +212,11 @@ namespace :html do
             :timeframe => '6w'
         }
     }
-    HTMLProofer.check_directory("#{@build_dir}", options).run
+    begin
+      HTMLProofer.check_directory("#{@build_dir}", options).run
+    rescue => msg
+      puts "#{msg}"
+    end
   end
 
   desc "Checks mailto links with htmlproofer custom test"
