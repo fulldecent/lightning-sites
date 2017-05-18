@@ -228,7 +228,11 @@ namespace :html do
             :timeframe => '6w'
         }
     }
-    HTMLProofer.check_directory("#{@build_dir}", options).run
+    begin
+      HTMLProofer.check_directory("#{@build_dir}", options).run
+    rescue => msg
+      puts "#{msg}"
+    end
   end
 
   desc "Find all external links"
