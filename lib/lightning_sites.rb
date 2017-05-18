@@ -222,8 +222,11 @@ namespace :html do
   desc "Checks mailto links with htmlproofer custom test"
   task :check_mailto_awesome do
     puts "⚡️  Checking mailto links".blue
+    checks_to_ignore = HTMLProofer::Check.subchecks.map(&:name)
+    checks_to_ignore.delete 'MailToAwesome'
     options = {
         :check_mailto_awesome => true,
+        :checks_to_ignore => checks_to_ignore,
         :cache => {
             :timeframe => '6w'
         }
