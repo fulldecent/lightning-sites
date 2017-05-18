@@ -1,6 +1,7 @@
 require 'html-proofer'
 require 'mail_to_awesome'
 require 'rake'
+require 'w3c_validators'
 
 # http://stackoverflow.com/a/11320444/300224
 Rake::TaskManager.record_task_metadata = true
@@ -10,6 +11,7 @@ Rake::TaskManager.record_task_metadata = true
 ################################################################################
 @source_dir = '.'            # Editable source code, preferrably in git repo
 @build_dir = 'BUILD'         # Built HTML code
+@build_css_dir = 'BUILD/css' # Built CSS files
 @backup_dir = 'BACKUPS'      # Local home for backups of remote server
 @remote_dir = '/dev/null'    # Your remote server, use rsync format
 @backup_targets = {}         # Hash from local name to remote directory
@@ -257,6 +259,32 @@ namespace :html do
       puts "Validation complete".green
     rescue Nokogiri::XML::SyntaxError => msg
       puts "#{msg}".red
+    end
+  end
+
+  desc "Validate css files"
+  task :validate_css do
+    include W3CValidators
+    puts "⚡️  Validating css files".blue
+    @validator = CSSValidator.new
+
+    files = `find #{@build_css_dir} -type f -name "*.css"`.split("\n")
+    found_errors = false
+    files.each{ |file|
+      results = @validator.validate_file(file)
+
+      if results.errors.length > 0
+        found_errors = true
+        puts file.red
+        results.errors.each do |err|
+          puts err.to_s.red
+        end
+      end
+    }
+    if found_errors
+      puts "CSS validation failed".red
+    else
+      puts "Validation complete".green
     end
   end
 end
