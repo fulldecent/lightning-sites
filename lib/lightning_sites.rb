@@ -248,15 +248,15 @@ namespace :html do
     args.with_defaults(:sitemap_path => "#{@build_dir}")
     sitemap_path = "#{args[:sitemap_path]}/sitemap.xml"
     puts "⚡️  Validating sitemap".blue
-    unless File.exist? sitemap_path
+    if File.exist? sitemap_path
+      begin
+        File.open(sitemap_path) { |f| Nokogiri::XML(f) { |config| config.strict } }
+        puts "Validation complete".green
+      rescue Nokogiri::XML::SyntaxError => msg
+        puts "#{msg}".red
+      end
+    else
       puts "Sitemap.xml doesn't exists in #{sitemap_path}".red
-      return
-    end
-    begin
-      File.open(sitemap_path) { |f| Nokogiri::XML(f) { |config| config.strict } }
-      puts "Validation complete".green
-    rescue Nokogiri::XML::SyntaxError => msg
-      puts "#{msg}".red
     end
   end
 end
