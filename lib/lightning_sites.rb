@@ -11,7 +11,6 @@ Rake::TaskManager.record_task_metadata = true
 ################################################################################
 @source_dir = '.'            # Editable source code, preferrably in git repo
 @build_dir = 'BUILD'         # Built HTML code
-@build_css_dir = 'BUILD/css' # Built CSS files
 @backup_dir = 'BACKUPS'      # Local home for backups of remote server
 @remote_dir = '/dev/null'    # Your remote server, use rsync format
 @backup_targets = {}         # Hash from local name to remote directory
@@ -268,7 +267,7 @@ namespace :html do
     puts "⚡️  Validating css files".blue
     @validator = CSSValidator.new
 
-    files = `find #{@build_css_dir} -type f -name "*.css"`.split("\n")
+    files = `find #{@build_dir} -type f -name "*.css"`.split("\n")
     found_errors = false
     files.each{ |file|
       results = @validator.validate_file(file)
