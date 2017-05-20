@@ -1,6 +1,7 @@
 require 'html-proofer'
 require 'mail_to_awesome'
 require 'rake'
+require 'w3c_validators'
 
 # http://stackoverflow.com/a/11320444/300224
 Rake::TaskManager.record_task_metadata = true
@@ -264,6 +265,32 @@ namespace :html do
       end
     else
       puts "Sitemap.xml doesn't exists in #{sitemap_path}".red
+    end
+  end
+
+  desc "Validate css files"
+  task :validate_css do
+    include W3CValidators
+    puts "⚡️  Validating css files".blue
+    @validator = CSSValidator.new
+
+    files = `find #{@build_dir} -type f -name "*.css"`.split("\n")
+    found_errors = false
+    files.each{ |file|
+      results = @validator.validate_file(file)
+
+      if results.errors.length > 0
+        found_errors = true
+        puts file.red
+        results.errors.each do |err|
+          puts err.to_s.red
+        end
+      end
+    }
+    if found_errors
+      puts "CSS validation failed".red
+    else
+      puts "Validation complete".green
     end
   end
 end
