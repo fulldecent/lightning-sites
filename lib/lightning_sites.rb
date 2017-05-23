@@ -196,7 +196,7 @@ namespace :html do
     begin
       HTMLProofer.check_directory("#{@build_dir}", options).run
     rescue => msg
-      puts "#{msg}"
+      abort "#{msg}".red
     end
   end
 
@@ -216,7 +216,7 @@ namespace :html do
     begin
       HTMLProofer.check_directory("#{@build_dir}", options).run
     rescue => msg
-      puts "#{msg}"
+      abort "#{msg}".red
     end
   end
 
@@ -235,7 +235,7 @@ namespace :html do
     begin
       HTMLProofer.check_directory("#{@build_dir}", options).run
     rescue => msg
-      puts "#{msg}"
+      abort "#{msg}".red
     end
   end
 
@@ -261,10 +261,10 @@ namespace :html do
         File.open(sitemap_path) { |f| Nokogiri::XML(f) { |config| config.strict } }
         puts "Validation complete".green
       rescue Nokogiri::XML::SyntaxError => msg
-        puts "#{msg}".red
+        abort "#{msg}".red
       end
     else
-      puts "Sitemap.xml doesn't exists in #{sitemap_path}".red
+      abort "Sitemap.xml doesn't exists in #{sitemap_path}".red
     end
   end
 
@@ -288,7 +288,7 @@ namespace :html do
       end
     }
     if found_errors
-      puts "CSS validation failed".red
+      abort "CSS validation failed".red
     else
       puts "Validation complete".green
     end
