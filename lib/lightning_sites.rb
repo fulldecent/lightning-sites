@@ -175,6 +175,42 @@ namespace :seo do
     sh 'zgrep', '-r', ' 301 ', "#{@backup_dir}/logs"
     puts "Found".green
   end
+
+  desc "Validate meta descriptions"
+  task :validate_meta_descriptions do
+    tag = "meta[name='description']"
+    max_length = 160
+    failed = false
+    files = `find #{@build_dir} -type f -name "*.html"`.split("\n")
+    files.each { |file|
+      begin
+        @doc = Nokogiri::XML(File.open(file))
+      rescue => msg
+        puts "#{msg}".red
+        break
+      end
+
+      if @doc.at(tag).nil?
+        failed = true
+        puts "#{file}\n\tMeta description not provided".red
+        break
+      end
+
+      content = @doc.at(tag)['content']
+      if content.length >= max_length
+        failed = true
+        puts "#{file}\n\tMeta description over #{max_length} characters".red
+      elsif content.length == 0
+        failed = true
+        puts "#{file}\n\tMeta description is empty".red
+      end
+    }
+    if failed
+      abort "Validation failed".red
+    else
+      puts "Validation complete".green
+    end
+  end
 end
 
 # Validation for built html folder
