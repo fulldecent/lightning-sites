@@ -13,11 +13,11 @@ Gem::Specification.new do |spec|
   spec.description   = "Lightning Sites gives you beautifully simple deployment for your ~/Sites folders, inspired by Fastlane. We support all deployment setups."
   spec.homepage      = "https://github.com/fulldecent/Sites"
   spec.license       = "MIT"
-  spec.files         = ['lib/lightning_sites.rb']
+  spec.files         = ["lib/lightning_sites.rb"]
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "colorize", "~> 0.8"
-  spec.add_runtime_dependency "html-proofer", ">= 3.7.2"
+  spec.add_runtime_dependency "html-proofer", ">= 3.7.3"
   spec.add_runtime_dependency "rake", ">= 12.0.0"
   spec.add_runtime_dependency "nokogiri", ">= 1.7.2"
   spec.add_runtime_dependency "web-puc", "~> 0.3.1"
