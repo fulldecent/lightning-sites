@@ -2,6 +2,7 @@ require 'html-proofer'
 require 'mail_to_awesome'
 require 'rake'
 require 'w3c_validators'
+require 'colorize'
 
 # http://stackoverflow.com/a/11320444/300224
 Rake::TaskManager.record_task_metadata = true
