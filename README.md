@@ -50,8 +50,7 @@ Next, create a `Rakefile` by starting with this and editing server credentials:
 
 ```ruby
 abort('Please run this using `bundle exec rake`') unless ENV["BUNDLE_BIN_PATH"]
-#require 'lightning_sites' # https://github.com/fulldecent/lightning-sites
-load 'LIGHTNINGSITES-BETA.rake'
+require 'lightning_sites' # https://github.com/fulldecent/lightning-sites
 
 @build_excludes.push('README.md','LICENSE','CONTRIBUTING.md')
 production_base = 'horseslov@172.16.11.23:'
