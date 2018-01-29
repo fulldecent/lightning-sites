@@ -41,9 +41,7 @@ And install with:
 
 ```sh
 gem install bundler
-bundle init; echo "gem 'lightning_sites'" >> Gemfile
-export NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-bundle install
+bundle install # this takes <10 minutes the first time
 ```
 
 Next, create a `Rakefile` by starting with this and editing server credentials:
