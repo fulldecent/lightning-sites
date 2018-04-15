@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "colorize", "~> 0.8"
   spec.add_runtime_dependency "html-proofer", ">= 3.7.4"
   spec.add_runtime_dependency "rake", ">= 12.0.0"
-  spec.add_runtime_dependency "nokogiri", ">= 1.7.2"
+  spec.add_runtime_dependency "nokogiri", ">= 1.8.2"
   spec.add_runtime_dependency "web-puc", "~> 0.3.1"
   spec.add_runtime_dependency "html-proofer-mailto_awesome", "~> 0.1.2"
   spec.add_runtime_dependency "w3c_validators", ">= 1.3.2"
