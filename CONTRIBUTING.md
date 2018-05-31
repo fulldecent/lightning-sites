@@ -9,3 +9,6 @@ Documentation referred from http://guides.rubygems.org/publishing/ and https://b
 
 1. gem bump  # and maybe use --version minor
 2. rake release
+
+#Contributions
+2018-05-30 @tstopak Updated build dependancies by running bundle update
