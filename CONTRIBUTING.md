@@ -7,6 +7,8 @@
 
 Documentation referred from http://guides.rubygems.org/publishing/ and https://bundler.io/v1.13/guides/creating_gem
 
+First do `gem install gem-release`
+
 1. gem bump  # and maybe use --version minor
 2. rake release
 
