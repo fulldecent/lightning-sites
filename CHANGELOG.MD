@@ -18,7 +18,7 @@ Released on 2018-05-30.
 - Updated build dependancies by running bundle update.  
   - Added by [Thomas Stopak](https://github.com/tstopak)
 
-## 1.3.6
+## 1.4.4
 Released on 2019-05-25
 
 
