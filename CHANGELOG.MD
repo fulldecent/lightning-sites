@@ -17,3 +17,10 @@ Released on 2018-05-30.
 
 - Updated build dependancies by running bundle update.  
   - Added by [Thomas Stopak](https://github.com/tstopak)
+
+## 1.4.4
+Released on 2019-05-25
+
+
+- Fixed wrong git version being saved.
+  - Added by [Ahmed Raza](https://github.com/Raza403)

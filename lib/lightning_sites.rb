@@ -84,7 +84,7 @@ namespace :git do
     end
     hash = `cd #{@source_dir} && git rev-parse HEAD`.chomp
     local_changes = `git diff --shortstat`.chomp.length
-    File.write(@build_dir + '/VERSION', local_changes ? "#{hash}*" : "#{hash}")
+    File.write(@build_dir + '/VERSION', local_changes > 0 ? "#{hash}*" : "#{hash}")
     puts 'Saved git version to VERSION file'.green
   end
 end
