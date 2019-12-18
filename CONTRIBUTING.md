@@ -10,7 +10,7 @@ Documentation referred from http://guides.rubygems.org/publishing/ and https://b
 First do `gem install gem-release`
 
 1. gem bump  # and maybe use --version minor
-2. rake release
+2. `bundle exec rake release`
 
 # Contributing
 Make sure to update the CHANGELOG.MD whenever you submit a pull request. 
