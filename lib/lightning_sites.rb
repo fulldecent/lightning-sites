@@ -1,5 +1,5 @@
 require 'html-proofer'
-require 'mail_to_awesome'
+require 'mailto_awesome'
 require 'rake'
 require 'w3c_validators'
 require 'colorize'
