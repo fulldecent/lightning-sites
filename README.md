@@ -70,7 +70,7 @@ task :publish => ['rsync:push']
 
 * Update `.gitignore` to include `tmp`, `BUILD/` and `BACKUP/`
 * Update `_travis.yml` to call `bundle exec rake test`, [see full example here](https://github.com/fulldecent/html-website-template/blob/master/.travis.yml)
-* Update Jekyll excludes in `_config.yml`, if you have one, and exclude these new files and gitignores
+* Update Jekyll excludes in `_config.yml`, if you have one, then exclude these new files and gitignores
 
 # How to use it
 
@@ -88,9 +88,9 @@ Here is the full list of tasks. This list comes up by default when you run `bund
 rake git:pull                  # Incorporate changes from the remote repository into the current branch
 rake git:save_version          # Save the commit hash to VERSION in the build directory
 rake git:stale_report          # Print the modified date for all files under source control
-rake git:status                # Displays paths that have differences between the index file and the current HEAD commit
-rake html:check                # Checks everything with htmlproofer that is reasonable to check
-rake html:check_onsite         # Checks HTML with htmlproofer, skip external links
+rake git:status                # Display paths that have differences between the index file and the current HEAD commit
+rake html:check                # Check everything with htmlproofer that is reasonable to check
+rake html:check_onsite         # Check HTML with htmlproofer, skip external links
 rake html:find_external_links  # Find all external links
 rake jekyll:build              # Build Jekyll site
 rake jekyll:test               # Run a Jekyll test server
