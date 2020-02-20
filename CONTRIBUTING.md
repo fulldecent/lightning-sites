@@ -10,7 +10,7 @@ Documentation referred from http://guides.rubygems.org/publishing/ and https://b
 gem bump
 rm *.gem
 gem build lightning_sites.gemspec
-gem push lightning_sites-1.4.11.gem
+gem push lightning_sites-*.gem
 ```
 
 # Contributing
