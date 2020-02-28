@@ -8,6 +8,7 @@ Documentation referred from http://guides.rubygems.org/publishing/ and https://b
 
 ```sh
 gem bump
+git push
 rm *.gem
 gem build lightning_sites.gemspec
 gem push lightning_sites-*.gem
