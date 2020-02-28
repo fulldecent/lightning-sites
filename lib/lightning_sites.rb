@@ -246,6 +246,10 @@ namespace :html do
         :check_html => true,
         :check_opengraph => true,
         :enforce_https => true,
+        :report_eof_tags => true,
+        :report_invalid_tags => true,
+        :report_mismatched_tags => true,
+        :report_missing_doctype => true,
         :cache => {
             :timeframe => '6w'
         }
