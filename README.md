@@ -1,5 +1,5 @@
 # :cloud: Lightning Sites
-[![Gem Version](https://badge.fury.io/rb/lightning-sites.svg)](http://badge.fury.io/rb/lightning-sites)
+[![Gem Version](https://d25lcipzij17d.cloudfront.net/badge.svg?id=gh&type=6&v=1.4.12&x2=0)](https://d25lcipzij17d.cloudfront.net/badge.svg?id=gh&type=6&v=1.4.12&x2=0)
 
 *Lightning Sites* gives you beautifully simple deployment for your ~/Sites folders, inspired by [Fastlane](https://fastlane.tools/). We support all deployment setups, such as:
 
