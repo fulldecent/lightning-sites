@@ -220,12 +220,17 @@ namespace :html do
   task :check do
     puts "⚡️  Checking HTML".blue
     options = {
-        :check_sri => true,
-        :check_external_hash => true,
-        :check_html => true,
-        :check_img_http => true,
-        :check_opengraph => true,
-        :enforce_https => true,
+      :disable_external => true,
+      :check_external_hash => true,
+      :check_sri => true,
+      :check_html => true,
+      :check_opengraph => true,
+      :check_img_http => true,
+      :enforce_https => true,
+      :report_eof_tags => true,
+      :report_invalid_tags => true,
+      :report_mismatched_tags => true,
+      :report_missing_doctype => true,
         :cache => {
           :timeframe => '6w'
         }
@@ -242,6 +247,7 @@ namespace :html do
     puts "⚡️  Checking HTML, skipping external links".blue
     options = {
         :disable_external => true,
+        :check_external_hash => true,
         :check_sri => true,
         :check_html => true,
         :check_opengraph => true,
