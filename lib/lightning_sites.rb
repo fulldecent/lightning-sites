@@ -274,10 +274,7 @@ namespace :html do
     checks_to_ignore.delete 'MailToAwesome'
     options = {
         :check_mailto_awesome => true,
-        :checks_to_ignore => checks_to_ignore,
-        :cache => {
-            :timeframe => '6w'
-        }
+        :checks_to_ignore => checks_to_ignore
     }
     begin
       HTMLProofer.check_directory("#{@build_dir}", options).run
