@@ -1,4 +1,4 @@
-# :cloud: Lightning Sites
+# :cloud: Lightning Sites ![Gem](https://img.shields.io/gem/v/lightning_sites)
 
 *Lightning Sites* gives you beautifully simple deployment for your ~/Sites folders, inspired by [Fastlane](https://fastlane.tools/). We support all deployment setups, such as:
 

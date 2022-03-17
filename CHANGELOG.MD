@@ -24,3 +24,7 @@ Released on 2019-05-25
 
 - Fixed wrong git version being saved.
   - Added by [Ahmed Raza](https://github.com/Raza403)
+
+
+- Included Ruby version badge in README
+  - Added by [Ahmed Raza](https://github.com/Raza403)
