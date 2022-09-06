@@ -28,3 +28,9 @@ Released on 2019-05-25
 
 - Included Ruby version badge in README
   - Added by [Ahmed Raza](https://github.com/Raza403)
+
+## 1.4.16
+Released on 2022-09-02
+
+- Added the missing gem 'webrick' as a run time dependency.
+  - Added by [Ahmed Raza](https://github.com/Raza403)

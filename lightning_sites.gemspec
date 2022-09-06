@@ -25,4 +25,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "w3c_validators", ">= 1.3.4"
   spec.add_development_dependency "bundler", ">= 2.1.1"
   spec.add_development_dependency "rspec", ">= 3.8.0"
+  spec.add_runtime_dependency "webrick", ">= 1.7.0"
 end
