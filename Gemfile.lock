@@ -46,7 +46,7 @@ GEM
     json-schema (2.8.1)
       addressable (>= 2.4)
     mercenary (0.4.0)
-    nokogiri (1.13.8-x86_64-linux)
+    nokogiri (1.13.9-x86_64-linux)
       racc (~> 1.4)
     parallel (1.22.1)
     public_suffix (5.0.0)
