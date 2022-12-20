@@ -231,6 +231,7 @@ namespace :html do
       :report_invalid_tags => true,
       :report_mismatched_tags => true,
       :report_missing_doctype => true,
+      :assume_extension => true,
         :cache => {
           :timeframe => '6w'
         }
@@ -256,6 +257,7 @@ namespace :html do
         :report_invalid_tags => true,
         :report_mismatched_tags => true,
         :report_missing_doctype => true,
+        :assume_extension => true,
         :cache => {
             :timeframe => '6w'
         }
