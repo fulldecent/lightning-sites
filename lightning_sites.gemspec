@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "web-puc", ">= 0.4.1"
   spec.add_runtime_dependency "html-proofer-mailto_awesome", "~> 1.0", ">= 1.0.3"
   spec.add_runtime_dependency "w3c_validators", "~> 1.3", ">= 1.3.7"
-  spec.add_development_dependency "bundler", "~> 2.3", ">= 2.3.26"
+  spec.add_development_dependency "bundler", "~> 2.3", ">= 2.3.20"
   spec.add_development_dependency "rspec", "~> 3.12"
   spec.add_runtime_dependency "webrick", "~> 1.7"
 end
