@@ -16,14 +16,14 @@ Gem::Specification.new do |spec|
   spec.files         = ["lib/lightning_sites.rb"]
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "colorize", ">= 0.8"
-  spec.add_runtime_dependency "html-proofer", ">= 3.19.1"
+  spec.add_runtime_dependency "colorize", "~> 0.8.1"
+  spec.add_runtime_dependency "html-proofer", "~> 5.0", ">= 5.0.3'"
   spec.add_runtime_dependency "rake", ">= 12.3.1"
   spec.add_runtime_dependency "nokogiri", ">= 1.11.4"
   spec.add_runtime_dependency "web-puc", ">= 0.4.1"
-  spec.add_runtime_dependency "html-proofer-mailto_awesome", ">= 1.0.1"
-  spec.add_runtime_dependency "w3c_validators", ">= 1.3.4"
-  spec.add_development_dependency "bundler", ">= 2.1.1"
-  spec.add_development_dependency "rspec", ">= 3.8.0"
-  spec.add_runtime_dependency "webrick", ">= 1.7.0"
+  spec.add_runtime_dependency "html-proofer-mailto_awesome", "~> 1.0", ">= 1.0.3"
+  spec.add_runtime_dependency "w3c_validators", "~> 1.3", ">= 1.3.7"
+  spec.add_development_dependency "bundler", "~> 2.3", ">= 2.3.26"
+  spec.add_development_dependency "rspec", "~> 3.12"
+  spec.add_runtime_dependency "webrick", "~> 1.7"
 end
