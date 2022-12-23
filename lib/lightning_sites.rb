@@ -220,7 +220,7 @@ namespace :html do
   task :check do
     puts "⚡️  Checking HTML".blue
     options = {
-      :disable_external => true,
+      :disable_external => false,
       :check_external_hash => true,
       :check_sri => true,
       :check_html => true,

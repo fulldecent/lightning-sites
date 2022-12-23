@@ -34,3 +34,11 @@ Released on 2022-09-02
 
 - Added the missing gem 'webrick' as a run time dependency.
   - Added by [Ahmed Raza](https://github.com/Raza403)
+
+  ## 1.4.22
+Released on 2022-12-20
+
+- HTML-proofer will not report an error for extionsionless URLs, HTML-proofer version upgraded to 5.x.x, HTML-proofer checking
+links from extenal sites option is enabled.
+  - Added by [Ahmed Raza](https://github.com/Raza403)
+
