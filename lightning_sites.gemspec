@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rake", ">= 12.3.1"
   spec.add_runtime_dependency "nokogiri", ">= 1.13.10"
   spec.add_runtime_dependency "web-puc", ">= 0.4.1"
-  spec.add_runtime_dependency "html-proofer-mailto_awesome", ">= 1.0.1"
+  spec.add_runtime_dependency "html-proofer-mailto_awesome", ">= 1.0.6"
   spec.add_runtime_dependency "w3c_validators", ">= 1.3.4"
   spec.add_development_dependency "bundler", ">= 2.1.1"
   spec.add_development_dependency "rspec", ">= 3.8.0"

@@ -34,3 +34,9 @@ Released on 2022-09-02
 
 - Added the missing gem 'webrick' as a run time dependency.
   - Added by [Ahmed Raza](https://github.com/Raza403)
+
+## 1.4.26
+Released on 2022-09-02
+
+- Updated version of html-proofer-mailto-awesome.
+  - Added by [Ahmed Raza](https://github.com/Raza403)

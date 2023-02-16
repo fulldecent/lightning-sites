@@ -1,3 +1,3 @@
 module LightningSites
-  VERSION = "1.4.17"
+  VERSION = "1.4.26"
 end
